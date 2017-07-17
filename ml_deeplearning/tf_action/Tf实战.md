@@ -122,7 +122,8 @@ TF 提供了placeholder机制用于提供输入数据，这个位置的数据在
     TF提供学习率设置方法————指数衰减法。 tf.train.exponential_decay函数实现了指数衰减学习策略，
     这个函数，可以先使用较大的学习率快速得到一个比较优的解，然后随着迭代的继续逐步减小学习率，使得模型在训练后期更加稳定。
     
-    exponential_decay=
+    exponential_decay如下实现:
+    
     decayed_learning_rate = learning_rate * decay_rate^(global_step/decay_steps)
     decayed_learning_rate:每一轮使用的学习率
     learning_rate:为事先设定的初始学习率
