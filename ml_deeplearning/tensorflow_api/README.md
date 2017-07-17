@@ -14,3 +14,40 @@
     constant 在使用的时候不需要initial_all_variables()
     variables 必须得实例化
     
+    saving and restored 
+        class tf.train.Saver
+    
+    
+    Checkpoints 是二进制文件将map变量映射到tensor值，
+    
+    saver.save(sess, 'my-model', global_step=0) ==> filename: 'my-model-0'
+    ...
+    saver.save(sess, 'my-model', global_step=1000) ==> filename: 'my-model-1000'
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -103,6 +103,17 @@ def variableTest2():
 
 
 def saverTest():
-    pass
+    # Create  a saver
+    v = tf.Variable([1, 2])
+    init = tf.initialize_all_variables()
+    save = tf.train.Saver([v])
+    sess = tf.Session()
+    # sess.run(init)
+    # print(save.last_checkpoints)
+    for step in range(1000):
+        sess.run(init)
+        if step % 100==0:
+            save.save(sess,'./my-model',global_step=step)
+    print(save.last_checkpoints('./'))
 
-variableTest()
+saverTest()
