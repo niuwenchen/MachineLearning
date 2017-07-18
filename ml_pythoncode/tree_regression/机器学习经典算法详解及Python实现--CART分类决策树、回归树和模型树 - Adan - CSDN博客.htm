@@ -1,0 +1,1293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    
+<head>  
+
+            <link rel="canonical" href="http://blog.csdn.net/suipingsp/article/details/42264413"/> 
+ <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848"> 
+       
+    <title>机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树 - Adan
+        - CSDN博客</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="Classification And Regression Tree(CART)是一种很重要的机器学习算法，既可以用于创建分类树（Classification Tree），也可以用于创建回归树（Regression Tree），本文介绍了CART用于离散标签分类决策和连续特征回归时的原理。决策树创建过程分析了信息混乱度度量Gini指数、连续和离散特征的特殊处理、连续和离散特征共存时函数的特殊处理和后剪枝；用于回归时则介绍了回归树和模型树的原理、适用场景和创建过程。个人认为，回归树和模型树可以被看做“群落分类" />
+
+    <meta name="keywords" content="python,机器学习,数据挖掘" />
+
+   
+    <script src="http://static.blog.csdn.net/scripts/blog_static_head.min.js" type="text/javascript"></script>
+
+    
+        <!--new top-->
+                      <!--new top-->
+    
+      <!-- ad begin -->
+         
+    <!-- ad end-->
+
+    <link rel="Stylesheet" type="text/css" href="http://static.blog.csdn.net/skin/ink/css/style.css?v=1.1" />
+
+    
+
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="/suipingsp/rss/list" />
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico" />
+    <link type="text/css" rel="stylesheet" href="http://static.blog.csdn.net/scripts/SyntaxHighlighter/styles/blue_green.css" />
+ 
+
+
+
+    <link href="http://c.csdnimg.cn/blog/csdn_public_blog_detail.min.css" type="text/css" rel="stylesheet" />
+     
+         <link rel="stylesheet" href="http://static.blog.csdn.net/css/csdn_blog_detail.min.css" />
+
+  
+
+
+    <!-- 请置于所有广告位代码之前 --> 
+            <script src="http://dup.baidustatic.com/js/ds.js"></script>
+
+</head>
+
+
+<body>
+     
+        <div class="tracking-ad" data-view="true" data-mod="ad_popu_72"  data-mtp="62" data-order="40" data-con="ad_content_2072" >
+                     <script id="popuLayer_js_q" src="http://ads.csdn.net/js/popuLayer.js" defer="defer"  type="text/javascript"></script>
+                <div id="layerd" style="position: fixed;bottom:0px;right:0px;line-height:0px;z-index:1000">
+    	                <div class="J_close layer_close" style="display:;background-color:#efefef;padding:0px;color:#333;font:12px/24px Helvetica,Tahoma,Arial,sans-serif;text-align:right;">关闭</div><!-- 广告占位容器 --><div id="cpro_u2895327"></div></div>
+                <script>  document.getElementById("popuLayer_js_q").onload = function () { var styObjd = styObj = { width: "300px", "height": parseInt(250) + 28 }; window.CSDN.Layer.PopuLayer("#layerd", { storageName: "layerd", styleObj: styObjd, total: 50, expoire: 1000 * 60 }); }</script><!-- 投放代码 --><script type="text/javascript">                    /*服务器频道首页置顶Banner960*90，创建于2014-7-3*/    (window.cproArray = window.cproArray || []).push({ id: "u2895327" });  </script>  <script src="http://cpro.baidustatic.com/cpro/ui/c.js" type="text/javascript"></script>
+     
+        </div>
+
+    <!-- 广告位开始 -->
+        
+    <!-- 广告位结束 -->
+
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="http://c.csdnimg.cn/public/common/toolbar/js/html.js" type="text/javascript"></script>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/suipingsp">Adan</a></h2>
+            <h3>登高，采他山之石以攻玉；入海，拾五洋之珠可炼珍</h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+        
+     
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>           
+                <li id="btnContents"><a href="http://blog.csdn.net/suipingsp?viewmode=contents"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_mulu'])">
+                    <img src="http://static.blog.csdn.net/images/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/suipingsp?viewmode=list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_zhaiyao'])">
+                    <img src="http://static.blog.csdn.net/images/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/suipingsp/rss/list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_RSS'])">
+                    <img src="http://static.blog.csdn.net/images/ico_rss.gif">订阅</span></a></li>                
+            
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "suipingsp";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/suipingsp";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod='popu_3' > 
+
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/75257273">
+<font color=red><strong>程序员，为什么写不好一份简历？</strong></font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/74550215">
+<font color=blue><strong>征文 | 你会为 AI 转型么？</strong></font></a>
+&nbsp;&nbsp;&nbsp;&nbsp
+
+
+<a href="http://blog.csdn.net/epubit17/article/details/74279903">
+<font color=red><strong>赠书：7月大咖新书机器学习/Android/python</strong></font></a>
+
+
+</div>                        </div>
+
+                        
+
+
+
+  
+
+
+
+
+
+
+<script   type="text/javascript" src="http://static.blog.csdn.net/scripts/category.js"></script>
+
+  <script type="text/ecmascript">
+      window.quickReplyflag = true;
+      var isBole = false; 
+      var fasrc="http://my.csdn.net/my/favorite/miniadd?t=%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e7%bb%8f%e5%85%b8%e7%ae%97%e6%b3%95%e8%af%a6%e8%a7%a3%e5%8f%8aPython%e5%ae%9e%e7%8e%b0--CART%e5%88%86%e7%b1%bb%e5%86%b3%e7%ad%96%e6%a0%91%e3%80%81%e5%9b%9e%e5%bd%92%e6%a0%91%e5%92%8c%e6%a8%a1%e5%9e%8b%e6%a0%91&u=http://blog.csdn.net/suipingsp/article/details/42264413"
+    </script>
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+    <h1>
+        <span class="link_title"><a href="/suipingsp/article/details/42264413">
+        机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树        
+           
+        </a>
+        </span>
+
+         
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href='http://www.csdn.net/tag/python' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">python</a><a href='http://www.csdn.net/tag/%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">机器学习</a><a href='http://www.csdn.net/tag/%e6%95%b0%e6%8d%ae%e6%8c%96%e6%8e%98' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">数据挖掘</a><a href='http://www.csdn.net/tag/CART' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">CART</a><a href='http://www.csdn.net/tag/%e5%9b%9e%e5%bd%92' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">回归</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2014-12-30 12:20</span>
+            <span class="link_view" title="阅读次数">10307人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="#comments" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_pinglun'])">评论</a>(5)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle('%e6%9c%ba%e5%99%a8%e5%ad%a6%e4%b9%a0%e7%bb%8f%e5%85%b8%e7%ae%97%e6%b3%95%e8%af%a6%e8%a7%a3%e5%8f%8aPython%e5%ae%9e%e7%8e%b0--CART%e5%88%86%e7%b1%bb%e5%86%b3%e7%ad%96%e6%a0%91%e3%80%81%e5%9b%9e%e5%bd%92%e6%a0%91%e5%92%8c%e6%a8%a1%e5%9e%8b%e6%a0%91','42264413');return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="#report" onclick="javascript:report(42264413,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script  type="text/javascript">
+        $(function () {
+            try
+            {
+                var lib = eval("("+$("#lib").attr("value")+")");
+                var html = "";
+                if (lib.err == 0) {
+                    $.each(lib.data, function (i) {
+                        var obj = lib.data[i];
+                        //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                        html += ' <a href="' + obj.url + '" target="_blank">';
+                        html += ' <img src="' + obj.logo + '">';
+                        html += ' <em><b>' + obj.name + '</b></em>';
+                        html += ' </a>';
+                    });
+                    if (html != "") {
+                        setTimeout(function () {
+                            $("#lib").html(html);                      
+                            $("#embody").show();
+                        }, 100);
+                    }
+                }      
+            } catch (err)
+            { }
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="http://static.blog.csdn.net/images/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label  onclick="GetCategoryArticles('2749113','suipingsp','top','42264413');">
+                        <span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_fenlei']);">机器学习<em>（8）</em></span>
+                      <img class="arrow-down" src="http://static.blog.csdn.net/images/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="http://static.blog.csdn.net/images/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a  href="http://blog.csdn.net/suipingsp/article/category/2749113"  target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_2749113">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+        <div   class="bog_copyright">         
+            <p  class="copyright_p" >版权声明：本文为博主原创文章，未经博主允许不得转载--“http://blog.csdn.net/suipingsp”。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+
+<div id="article_content" class="article_content tracking-ad" data-mod=popu_307  data-dsm = "post" >
+
+<h1><span style="font-size:14px">摘要：</span></h1>
+<p><span style="font-size:14px">Classification And Regression Tree(CART)是一种很重要的机器学习算法，既可以用于创建分类树（Classification Tree），也可以用于创建回归树（Regression Tree），本文介绍了CART用于离散标签分类决策和连续特征回归时的原理。决策树创建过程分析了信息混乱度度量Gini指数、连续和离散特征的特殊处理、连续和离散特征共存时函数的特殊处理和后剪枝；用于回归时则介绍了回归树和模型树的原理、适用场景和创建过程。个人认为，回归树和模型树可以被看做“群落分类”算法，群落内标签&#20540;连续分布，群落间有分界。</span></p>
+<h1><span style="font-size:14px">（一）认识CART算法</span></h1>
+<p><span style="font-size:14px">Classification And Regression Tree(CART)是决策树的一种，并且是非常重要的决策树，属于Top Ten Machine Learning Algorithm。顾名思义，CART算法既可以用于创建分类树（Classification Tree），也可以用于创建回归树（Regression Tree）、模型树（Model Tree），两者在建树的过程稍有差异。前文“<a target="_blank" target="_blank" href="http://blog.csdn.net/suipingsp/article/details/41927247">机器学习经典算法详解及Python实现--决策树（Decision
+ Tree）</a>”详细介绍了分类决策树原理以及ID3、C4.5算法，本文在该文的基础上详述CART算法在决策树分类以及树回归中的应用。</span></p>
+<p><span style="font-size:14px">创建分类树递归过程中，CART每次都选择当前数据集中具有最小Gini信息增益的特征作为结点划分决策树。ID3算法和C4.5算法虽然在对训练样本集的学习中可以尽可能多地挖掘信息，但其生成的决策树分支、规模较大，CART算法的二分法可以简化决策树的规模，提高生成决策树的效率。对于连续特征，CART也是采取和C4.5同样的方法处理。为了避免过拟合(Overfitting)，CART决策树需要剪枝。预测过程当然也就十分简单，根据产生的决策树模型，延伸匹配特征&#20540;到最后的叶子节点即得到预测的类别。</span></p>
+<p><span style="font-size:14px">创建回归树时，观察&#20540;取&#20540;是连续的、没有分类标签，只有根据观察数据得出的&#20540;来创建一个预测的规则。在这种情况下，Classification Tree的最优划分规则就无能为力，CART则使用最小剩余方差(Squared Residuals Minimization)来决定Regression Tree的最优划分，该划分准则是期望划分之后的子树误差方差最小。创建模型树，每个叶子节点则是一个机器学习模型，如线性回归模型。</span></p>
+<p><span style="font-size:14px">CART算法的重要基础包含以下三个方面：</span></p>
+<p><span style="font-size:14px">（1）二分(Binary Split)：在每次判断过程中，都是对观察变量进行二分。</span></p>
+<p><span style="font-size:14px">CART算法采用一种二分递归分割的技术，算法总是将当前样本集分割为两个子样本集，使得生成的决策树的每个非叶结点都只有两个分枝。因此CART算法生成的决策树是结构简洁的二叉树。因此CART算法适用于样本特征的取&#20540;为是或非的场景，对于连续特征的处理则与C4.5算法相&#20284;。</span></p>
+<p><span style="font-size:14px">（2）单变量分割(Split Based on One Variable)：每次最优划分都是针对单个变量。</span></p>
+<p><span style="font-size:14px">（3）剪枝策略：CART算法的关键点，也是整个Tree-Based算法的关键步骤。</span></p>
+<p><span style="font-size:14px">剪枝过程特别重要，所以在最优决策树生成过程中占有重要地位。有研究表明，剪枝过程的重要性要比树生成过程更为重要，对于不同的划分标准生成的最大树(Maximum Tree)，在剪枝之后都能够保留最重要的属性划分，差别不大。反而是剪枝方法对于最优树的生成更为关键。</span></p>
+<h1><span style="font-size:14px">（二）CART分类决策树</span></h1>
+<h2><span style="font-size:14px">1，CART的信息论基础和算法过程</span></h2>
+<p><span style="font-size:14px">CART与C4.5的不同之处是节点分裂建立在GINI指数这个概念上，GINI指数主要是度量数据划分或训练数据集D的不纯度为主。GINI&#20540;越小，表明样本的纯净度越高（即该样本只属于同一类的概率越高）。衡量出数据集某个特征所有取&#20540;的Gini指数后，就可以得到该特征的Gini Split info，也就是GiniGain。不考虑剪枝情况下，分类决策树递归创建过程中就是每次选择GiniGain最小的节点做分叉点，直至子数据集都属于同一类或者所有特征用光了。</span></p>
+<p><span style="font-size:14px">因为CART二分的特性，当训练数据具有两个以上的类别，CART需考虑将目标类别合并成两个超类别，这个过程称为双化。超类别总如何进一步区分类别呢？根据别的特征进一步分类？TBD</span></p>
+<p><span style="font-size:14px">（1）Gini指数的概念：</span></p>
+<p><span style="font-size:14px">GINI指数是一种不等性度量，通常用来度量收入不平衡，可以用来度量任何不均匀分布，是介于0~1之间的数，0-完全相等，1-完全不相等。分类度量时，总体内包含的类别越杂乱，GINI指数就越大(跟熵的概念很相&#20284;)。</span></p>
+<p><span style="font-size:14px">对于一个数据集T，其Gini计算方式为：</span></p>
+<p><span style="font-size:14px"><wbr>&nbsp;<img src="http://img.blog.csdn.net/20141230121630484" alt="">（n表示类别数，pj表数据集样本不同类别的概率）</span></p>
+<p><span style="font-size:14px">（2）GiniGain</span></p>
+<p><span style="font-size:14px">衡量出某个特征所有取&#20540;的Gini指数就可以得到Gini Split Info<img alt="" src="file:///E:/Aidan-personal/Study/%E7%9F%A5%E8%AF%86%E7%AE%A1%E7%90%86/PROJECTS/%E4%B8%93%E4%B8%9A%E6%8A%80%E6%9C%AF/attachment/201412/20141223110037450.png"></span></p>
+<p><img src="http://img.blog.csdn.net/20141230121718578" alt=""><span style="font-size:14px">，i表示特征的第i个取&#20540;</span></p>
+<p><span style="font-size:14px">ID3算法中的信息增益相&#20284;，这个可以称为是Gini信息增益--Gini Gain。对于CART，i=（1,2），得到在Binary Split情况下的Gini信息增益：</span></p>
+<p><span style="font-size:14px"><img src="http://img.blog.csdn.net/20141230121806625" alt=""><br>
+</span></p>
+<span style="font-size:14px"><img alt="" src="file:///E:/Aidan-personal/Study/%E7%9F%A5%E8%AF%86%E7%AE%A1%E7%90%86/PROJECTS/%E4%B8%93%E4%B8%9A%E6%8A%80%E6%9C%AF/attachment/201412/20141223110052872.png"></span>
+<h2><span style="font-size:14px">2，对离散分布、且取&#20540;数目&gt;=3的特征的处理：</span></h2>
+<p><span style="font-size:14px">正是因为CART树是二叉树，所以对于样本的有N&gt;=3个取&#20540;的离散特征的处理时也只能有两个分支，这就要通过组合人为的创建二取&#20540;序列并取GiniGain最小者作为树分叉决策点。如某特征&#20540;具有['young','middle','old']三个取&#20540;,那么二分序列会有如下3种可能性(空集和满集在CART分类中没有意义):</span></p>
+<p><span style="font-size:14px">[(('young',), ('middle', 'old')), (('middle',), ('young', 'old')), (('old',), ('young', 'middle'))]</span></p>
+<p><span style="font-size:14px">采用CART算法，就需要分别计算按照上述List中的二分序列做分叉时的Gini指数，然后选取产生最小的GINIGain的二分序列做该特征的分叉二&#20540;序列参与树构建的递归。如果某特征取&#20540;有4个，那么二分序列组合就有7种，5个取&#20540;就有15种组合，创建多&#20540;离散特征二分序列组合可采用Python的itertools包，程序如下：</span></p>
+<div class="dp-highlighter">
+<div class="bar">
+<div class="tools"><span style="float:left"><span style="font-size:14px">Source Code:</span></span><span style="font-size:14px"><a>▼</a><a></a><a>Copy</a><a></a><a></a></span></div>
+</div>
+<ol class="dp-py">
+<li class="alt"><span style="font-size:14px"><span class="keyword">from</span>&nbsp;<span class="commonlibs">itertools</span>&nbsp;<span class="keyword">import</span>&nbsp;* &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">import</span>&nbsp;pdb &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">def</span>&nbsp;featuresplit(features): &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="builtins">&nbsp;&nbsp;&nbsp; count</span>&nbsp;=&nbsp;<span class="builtins">len</span>(features) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; featureind&nbsp;=&nbsp;<span class="builtins">range</span>(<span class="builtins">count</span>) &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; featureind.<span class="builtins">pop</span>(0) #get value 1~(count-1)&nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; combiList&nbsp;=&nbsp;[] &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; for</span>&nbsp;i&nbsp;<span class="keyword">in</span>&nbsp;featureind: &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; com&nbsp;=&nbsp;<span class="builtins">list</span>(combinations(features,&nbsp;<span class="builtins">len</span>(features[0:i]))) &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; combiList.<span class="builtins">extend</span>(com) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; combiLen&nbsp;=&nbsp;<span class="builtins">len</span>(combiList) &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;featuresplitGroup&nbsp;=&nbsp;<span class="builtins">zip</span>(combiList[0:combiLen/2],&nbsp;combiList[combiLen-1:combiLen/2-1:-1]) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; return</span>&nbsp;featuresplitGroup &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">if</span>&nbsp;<span class="builtins">__name__</span>&nbsp;==&nbsp;'<span class="builtins">__main__</span>': &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; test=&nbsp;<span class="builtins">range</span>(3) &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; splitGroup&nbsp;=&nbsp;featuresplit(test) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; print</span>&nbsp;'splitGroup',&nbsp;<span class="builtins">len</span>(splitGroup),&nbsp;splitGroup &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; test=&nbsp;<span class="builtins">range</span>(4) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; splitGroup&nbsp;=&nbsp;featuresplit(test) &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; print</span>&nbsp;'splitGroup',&nbsp;<span class="builtins">len</span>(splitGroup),splitGroup &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; test=&nbsp;<span class="builtins">range</span>(5) &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; splitGroup&nbsp;=&nbsp;featuresplit(test) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; print</span>&nbsp;'splitGroup',&nbsp;<span class="builtins">len</span>(splitGroup),splitGroup &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; test=&nbsp;['young','middle','old'] &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; splitGroup&nbsp;=&nbsp;featuresplit(test) &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; print</span>&nbsp;'splitGroup',&nbsp;<span class="builtins">len</span>(splitGroup),splitGroup&nbsp;&nbsp;</span></li></ol>
+</div>
+<p><span style="font-size:14px">因此CART不适用于离散特征有多个取&#20540;可能的场景。此时，若定要使用CART，则最好预先人为的将离散特征的取&#20540;缩减。</span></p>
+<p><span style="font-size:14px">那么对于二分后的左右分支，如果特征取&#20540;tuple中元素多于2个，该特征是否还要继续参与当前子数据集的二分呢？TBD</span></p>
+<p><span style="font-size:14px">我认为需要，因此该特征继续参与分类决策树递归，直至左右分支上该特征的取&#20540;都是唯一的（即不再包含该特征）。那么离散特征的datasplit函数就应该：如果按照当前分支特征分叉后，分支上特征取&#20540;tuple&gt;=2，则分支子数据集保留该特征，该tuple继续参与上的树构建的递归；否则分支子数据集删除该特征。</span></p>
+<div class="dp-highlighter">
+<div class="bar">
+<div class="tools"><span style="float:left"><span style="font-size:14px">Source Code:</span></span><span style="font-size:14px"><a>▼</a><a></a><a>Copy</a><a></a><a></a></span></div>
+</div>
+<ol class="dp-py">
+<li class="alt"><span style="font-size:14px"><span class="keyword">def</span>&nbsp;splitDataSet(dataSet,&nbsp;axis,&nbsp;valueTuple): &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="string">&nbsp;&nbsp;&nbsp; '''return&nbsp;dataset&nbsp;satisfy&nbsp;condition&nbsp;dataSet[i][axis]&nbsp;==&nbsp;valueTuple,</span>&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="string">&nbsp;&nbsp;&nbsp; and&nbsp;remove&nbsp;dataSet[i][axis]&nbsp;if&nbsp;len(valueTuple)==1'''</span>&nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp; retDataSet&nbsp;=&nbsp;[] &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp; length&nbsp;=&nbsp;<span class="builtins">len</span>(valueTuple) &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; if</span>&nbsp;length&nbsp;==1: &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for</span>&nbsp;featVec&nbsp;<span class="keyword">in</span>&nbsp;dataSet: &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if</span>&nbsp;featVec[axis]&nbsp;==&nbsp;valueTuple[0]: &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reducedFeatVec&nbsp;=&nbsp;featVec[:axis]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">#chop&nbsp;out&nbsp;axis&nbsp;used&nbsp;for&nbsp;splitting</span>&nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; reducedFeatVec.<span class="builtins">extend</span>(featVec[axis&#43;1:]) &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; retDataSet.<span class="builtins">append</span>(reducedFeatVec) &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp;&nbsp;else</span>: &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span>&nbsp;featVec&nbsp;<span class="keyword">in</span>&nbsp;dataSet: &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if</span>&nbsp;featVec[axis]&nbsp;<span class="keyword">in</span>&nbsp;valueTuple: &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; retDataSet.<span class="builtins">append</span>(featVec) &nbsp;&nbsp;</span></li><li><span style="font-size:14px"><span class="keyword">&nbsp;&nbsp;&nbsp; return</span>&nbsp;retDataSet&nbsp;&nbsp;</span></li></ol>
+</div>
+<h2><span style="font-size:14px">3，对连续特征的处理</span></h2>
+<p><span style="font-size:14px">连续属性参考C4.5的离散化过程，区别在于CART算法中要以GiniGain最小作为分界点选取标准。是否需要修正？处理过程为：</span></p>
+<p><span style="font-size:14px">先把连续属性转换为离散属性再进行处理。虽然本质上属性的取&#20540;是连续的，但对于有限的采样数据它是离散的，如果有N条样本，那么我们有N-1种离散化的方法：&lt;=v<sub>j</sub>的分到左子树，&gt;v<sub>j</sub>的分到右子树。计算这N-1种情况下最大的信息增益率。另外，对于连续属性先进行排序（升序），只有在决策属性（即分类发生了变化）发生改变的地方才需要切开，这可以显著减少运算量。</span></p>
+<p><span style="font-size:14px"><wbr></span></p>
+<p><span style="font-size:14px">（1）&nbsp;<wbr>对特征的取&#20540;进行升序排序</span></p>
+<p><span style="font-size:14px"><wbr><wbr><wbr><wbr><wbr>（2）&nbsp;<wbr>两个特征取&#20540;之间的中点作为可能的分裂点，将数据集分成两部分，计算每个可能的分裂点的GiniGain。优化算法就是只计算分类属性发生改变的那些特征取&#20540;</span></p>
+<p><span style="font-size:14px"><wbr><wbr><wbr><wbr><wbr><wbr>（3）选择GiniGain最小的分裂点作为该特征的最佳分裂点（注意，若修正则此处需对最佳分裂点的Gini Gain减去log2(N-1)/|D|（N是连续特征的取&#20540;个数，D是训练数据数目）</span></p>
+<p><span style="font-size:14px">实现连续特征数据集划分的Python程序为(采用Numpy matrix，连续特征取&#20540;就可以省略排序这一步了)：</span></p>
+<p class="dp-highlighter"></p>
+<p class="bar"></p>
+<p class="tools"><span style="font-size:14px">Source Code:<a>▼</a><a>Copy</a></span></p>
+<p></p>
+<ol class="dp-py">
+<li class="alt"><span style="font-size:14px">def&nbsp;binSplitDataSet(dataSet,&nbsp;feature,&nbsp;value): &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;mat0&nbsp;=&nbsp;dataSet[nonzero(dataSet[:,feature]&nbsp;&gt;&nbsp;value)[0],:][0] &nbsp;&nbsp;</span></li><li class="alt"><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;mat1&nbsp;=&nbsp;dataSet[nonzero(dataSet[:,feature]&nbsp;&lt;=&nbsp;value)[0],:][0] &nbsp;&nbsp;</span></li><li><span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;mat0,mat1&nbsp;&nbsp;</span></li></ol>
+<p></p>
+<p><span style="font-size:14px">其中dataset为numpy matrix， feature为dataset连续特征在dataset所有特征中的index，value即为feature的一个取&#20540;。</span></p>
+<p><span style="font-size:14px">必须注意的是：根据离散特征分支划分数据集时，子数据集中不再包含该特征（因为每个分支下的子数据集该特征的取&#20540;就会是一样的，信息增益或者Gini Gain将不再变化）；而根据连续特征分支时，各分支下的子数据集必须依旧包含该特征（当然，左右分支各包含的分别是取&#20540;小于、大于等于分裂&#20540;的子数据集），因为该连续特征再接下来的树分支过程中可能依旧起着决定性作用。</span></p>
+<h2><span style="font-size:14px">4，训练数据汇总离散特征和连续特征混合存在时的处理</span></h2>
+<p><span style="font-size:14px">C4.5和CART算法决策树创建过程中，由于离散特征和连续特征的处理函数不同。当训练数据中两种特征并存时必须能够识别分布类型，从而调用相应的函数。那么有两种方法：</span></p>
+<p><span style="font-size:14px">（1）每个特征注明是连续分布还是离散分布，如0表示离散、1表示连续.如此训练、决策时都可以分辨分布类型。</span></p>
+<p><span style="font-size:14px">（2）函数中根据特征取&#20540;的个数判定，如featureValueCount&gt;10（当然，离散特征取&#20540;不可能这么多）则为连续分布，否则为离散分布。此时构建的决策树模型中，必须注明特征的分布类型（如构建一个List，长度为featureCount，其中元素0：离散，1：连续）。</span></p>
+<p><span style="font-size:14px">Note:对于取&#20540;为是或者否的离散特征，将其按离散或者连续分布处理均可。按照连续分布反而简单，取std=0.5即可简单的实现split。此时分布判断标准更改为featureValueCount&gt;20 or ==2。</span></p>
+<p><span style="font-size:14px">(3) 利用独热编码（OneHotEncoding），Python sklearn 的preprocessing提供了OneHotEncoder()能够将离散&#20540;转换成连续&#20540;处理。独热编码即 One-Hot 编码，又称一位有效编码，其方法是使用N位状态寄存器来对N个状态进行编码，每个状态都由他独立的寄存器位，并且在任意时候，其中只有一位有效。对于每一个特征，如果它有m个可能&#20540;，那么经过独热编码后，就变成了m个二元特征。并且，这些特征互斥，每次只有一个激活。因此，数据会变成稀疏的。这样做的好处主要有：解决了分类器不好处理属性数据的问题、在一定程度上也起到了扩充特征的作用。参考‘<a target="_blank" target="_blank" title="" href="http://willz.net/blog/2013/07/13/data_preprocessing_via_onehotencoder/"><u><span style="color:#0000ff">OneHotEncoder进行数据预处理</span></u></a>’。</span></p>
+<h2><span style="font-size:14px">5，CART的剪枝</span></h2>
+<p><span style="font-size:14px">分析分类回归树的递归建树过程，不难发现它实质上存在着一个数据过度拟合问题。在决策树构造时，由于训练数据中的噪音或孤立点，许多分枝反映的是训练数据中的异常，使用这样的判定树对类别未知的数据进行分类，分类的准确性不高。因此试图检测和减去这样的分支，检测和减去这些分支的过程被称为树剪枝。树剪枝方法用于处理过分适应数据问题。通常，这种方法使用统计度量，减去最不可靠的分支，这将导致较快的分类，提高树独立于训练数据正确分类的能力。决策树常用的剪枝常用的简直方法有两种：预剪枝(Pre-Pruning)和后剪枝(Post-Pruning)。预剪枝是根据一些原则及早的停止树增长，如树的深度达到用户所要的深度、节点中样本个数少于用户指定个数、不纯度指标下降的最大幅度小于用户指定的幅度等；后剪枝则是通过在完全生长的树上剪去分枝实现的，通过删除节点的分支来剪去树节点，可以使用的后剪枝方法有多种，比如：代价复杂性剪枝、最小误差剪枝、悲观误差剪枝等等。</span></p>
+<p><span style="font-size:14px">CART常采用事后剪枝方法，构建决策树过程中的第二个关键就是用独立的验证数据集对训练集生长的树进行剪枝。TBD</span></p>
+<p><span style="font-size:14px">关于后剪枝的具体理论可以参考“<a target="_blank" target="_blank" title="" href="http://blog.csdn.net/u011067360/article/details/24871801">数据挖掘十大经典算法--CART: 分类与回归树</a>”剪枝部分。</span></p>
+<h2><span style="font-size:14px">6，Python实现CART决策树</span></h2>
+<p><span style="font-size:14px">相对于ID3、C4.5决策树算法，CART算法的的实现过程在结构上是类&#20284;的，区别在于：</span></p>
+<p><span style="font-size:14px">（1）最佳特征度量采取Gini Gain，因此calcShannonEnt方法要替换成calcGini方法</span></p>
+<p><span style="font-size:14px">（2）CART采取二分法，因此对于有多个取&#20540;的离散特征，需要首先获取最小二分序列及其GiniGain，因此splitDataSet方法需按照取&#20540;tuple分开、chooseBestFetureToSplit要返回最佳分叉点及其二分序列如(('middle',), ('young', 'old'))。</span></p>
+<p><span style="font-size:14px">（3）决策树模型判决算法中对于离散特征也要根据特征&#20540;Tuple进行，即判断特征&#20540;取&#20540;属于左分支还是有分支；对于连续特征则是判断特征&#20540;取&#20540;是大于分裂&#20540;还是小于等于分裂&#20540;。</span></p>
+<h1><span style="font-size:14px">（三）CART回归树和模型树</span></h1>
+<p><span style="font-size:14px">当数据拥有众多特征并且特征之间关系十分复杂时，构建全局模型的想法就显得太难了，也略显笨拙。而且，实际生活中很多问题都是非线性的，不可能使用全局线性模型来拟合任何数据。一种可行的方法是将数据集切分成很多份易建模的数据，然后利用线性回归技术来建模。如果首次切分后仍然难以拟合线性模型就继续切分。在这种切分方式下，树结构和回归法就相当有用。</span></p>
+<p><span style="font-size:14px">回归树与分类树的思路类&#20284;，但叶节点的数据类型不是离散型，而是连续型，对CART稍作修改就可以处理回归问题。CART算法用于回归时根据叶子是具体指还是另外的机器学习模型又可以分为回归树和模型树。但无论是回归树还是模型树，其适用场景都是：标签&#20540;是连续分布的，但又是可以划分群落的，群落之间是有比较鲜明的区别的，即每个群落内部是相&#20284;的连续分布，群落之间分布确是不同的。所以回归树和模型树既算回归，也称得上分类。</span></p>
+<p><span style="font-size:14px">回归是为了处理预测&#20540;是连续分布的情景，其返回&#20540;应该是一个具体预测&#20540;。回归树的叶子是一个个具体的&#20540;，从预测&#20540;连续这个意义上严&#26684;来说，回归树不能称之为“回归算法”。因为回归树返回的是“一团”数据的均&#20540;，而不是具体的、连续的预测&#20540;（即训练数据的标签&#20540;虽然是连续的，但回归树的预测&#20540;却只能是离散的）。所以回归树其实也可以算为“分类”算法，其适用场景要具备“物以类聚”的特点，即特征&#20540;的组合会使标签属于某一个“群落”，群落之间会有相对鲜明的“鸿沟”。如人的风&#26684;是一个连续分布，但是却又能“群分”成文艺、普通和2B三个群落，利用回归树可以判断一个人是文艺还是2B，但却不能度量其有多文艺或者多2B。所以，利用回归树可以将复杂的训练数据划分成一个个相对简单的群落，群落上可以再利用别的机器学习模型再学习。</span></p>
+<p><span style="font-size:14px">模型树的叶子是一个个机器学习模型，如线性回归模型，所以更称的上是“回归”算法。利用模型树就可以度量一个人的文艺&#20540;了。</span></p>
+<p><span style="font-size:14px">回归树和模型树也需要剪枝,剪枝理论和分类树相同。为了获得最佳模型，树剪枝常采用预剪枝和后剪枝结合的方法进行。</span></p>
+<p><span style="font-size:14px">那么如何利用CART构建回归树或者模型树呢？且听下面细细道来。</span></p>
+<h2><span style="font-size:14px">1，回归树-利用差&#20540;选择分支特征</span></h2>
+<p><span style="font-size:14px">树回归中，为成功构建以分段常数为叶节点的树，需要度量出数据的一致性。分类决策树创建时会在给定节点时计算分类数据的混乱度。那么如何计算连续型数&#20540;的混乱度呢？ 事实上， 在连续数据集上计算混乱度是非常简单的--度量按某一特征划分前后标签数据总差&#20540;，每次选取使数据总差&#20540;最小的那个特征做最佳分支特征为了对正负差&#20540;同等看待，一般使用绝对&#20540;或平方&#20540;来代替上述差&#20540;）。为什么选择计算差&#20540;呢》差&#20540;越小，相&#20284;度越高，越可能属于一个群落咯。那么如果选取方差做差&#20540;，总方差的计算方法有两种：</span></p>
+<p><span style="font-size:14px">（1）计算数据集均&#20540;std，计算每个数据点与std的方差，然后n个点求和。</span></p>
+<p><span style="font-size:14px">（2）计算数据集方差var，然后var_sum = var*n，n为数据集数据数目。Python Matrix中可以利用var方法求得数据集方差，因此该方法简单、方便。</span></p>
+<p><span style="font-size:14px">与Gini Gain对离散特征和连续特征的处理方法类&#20284;，多&#20540;离散特征需要选择最优二分序列，连续特征则要找出最优分裂点。</span></p>
+<p><span style="font-size:14px">那么，每次最佳分支特征的选取过程为：</span></p>
+<p><span style="font-size:14px">function chooseBestSplitFeature()</span></p>
+<p><span style="font-size:14px">(1)先令最佳方差为无限大bestVar=inf。</span></p>
+<p><span style="font-size:14px">(2)依次计算根据某特征（FeatureCount次迭代）划分数据后的总方差currentVar（，计算方法为：划分后左右子数据集的总方差之和），如果currentVar&lt;bestVar，则bestVar=currentVar.</span></p>
+<p><span style="font-size:14px">(3)返回最佳分支特征、分支特征&#20540;（离散特征则为二分序列、连续特征则为分裂点的&#20540;），左右分支子数据集。</span></p>
+<h2><span style="font-size:14px">2，采取线性回归预测偏差构建模型树</span></h2>
+<p><span style="font-size:14px">用树来对数据建模，除了把叶节点简单地设定为常数&#20540;之外，还有一种方法是把叶节点设定为分段线性函数，这里所谓的分段线性（piecewise linear)是指模型由多个线性片段组成，这就是模型树。模型树的可解释性是它优于回归树的特点之一。另外，模型树也具有更髙的预测准确度。</span></p>
+<p><span style="font-size:14px">模型树的创建过程大体上与回归树是一样的，区别就在于递归过程中最佳分支特征选取时差&#20540;的计算。对于模型树：给定的数据集先用线性的模型来对它进行拟合，然后计算真实的目标&#20540;与模型预测&#20540;间的差&#20540;，将这些差&#20540;的平方求和就得到了所需的总差&#20540;，最后依然选取总差&#20540;最小的特征做分支特征。至于线性回归采用哪种解法，就要参看线性回归模型的求解了。</span></p>
+<p><span style="font-size:14px">3，CART回归树和模型树的Python实现</span></p>
+<p><span style="font-size:14px">CART回归树和模型树学习包的下载地址是：</span></p>
+<p><span style="font-size:14px">TBD</span></p>
+<p><span style="font-size:14px">引用：</span></p>
+<p><a target="_blank" target="_blank" title="" href="http://www.haodaima.net/art/1940231"><span style="font-size:14px">DecisionTree：CART、剪枝</span></a></p>
+<p><span style="font-size:14px">本文作者<a target="_blank" target="_blank" title="" href="http://blog.csdn.net/suipingsp?viewmode=contents">Adan</a>，来源于:<a target="_blank" href="http://blog.csdn.net/suipingsp/article/details/42264413">机器学习经典算法详解及Python实现--CART分类决策树分类和回归树</a><a target="_blank" target="_blank" href="http://blog.csdn.net/suipingsp/article/details/41897901"></a>。转载请注明出处。</span></p>
+   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad" style="float: right;" data-mod="popu_172">
+<a href="#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"  style="background-position:0 -52px !important"></a>
+<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"style="background-position:0 -104px !important"></a>
+<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"style="background-position:0 -260px !important"></a>
+<a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"style="background-position:0 -208px !important"></a>
+<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"style="background-position:0 -1612px !important" ></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "1", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+<!-- Baidu Button END -->
+
+   
+
+<!--172.16.140.12-->
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+
+
+ 
+
+
+        <div id="digg" ArticleId="42264413" >
+            <dl id="btnDigg" class="digg digg_disable"  onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>5</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable"  onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>0</dd>               
+            </dl>
+            
+        </div>
+     <div class="tracking-ad" data-mod="popu_222"><a href="javascript:void(0);" >&nbsp;</a>   </div>
+    <div class="tracking-ad" data-mod="popu_223"> <a href="javascript:void(0);" >&nbsp;</a></div>
+    <script type="text/javascript">
+                function btndigga() {
+                    $(".tracking-ad[data-mod='popu_222'] a").click();
+                }
+                function btnburya() {
+                    $(".tracking-ad[data-mod='popu_223'] a").click();
+                }
+            </script>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span  onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian']);location.href='http://blog.csdn.net/suipingsp/article/details/42101139';">上一篇</span><a href="http://blog.csdn.net/suipingsp/article/details/42101139" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian'])">机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法</a></li>
+                <li class="next_article"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian']);location.href='http://blog.csdn.net/suipingsp/article/details/42495317';">下一篇</span><a href="http://blog.csdn.net/suipingsp/article/details/42495317" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian'])">机器学习经典算法详解及Python实现--聚类及K均值、二分K-均值聚类算法</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+            <div class="similar_article"   >
+                    <h4></h4>
+                    <div class="similar_c"style="margin:20px 0px 0px 0px">
+                        <div class="similar_c_t">
+                          &nbsp;&nbsp;相关文章推荐
+                        </div>
+                   
+                        <div class="similar_wrap tracking-ad" data-mod="popu_36" >                       
+                            <ul class="similar_list fl">    
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/wzmsltw/article/details/51057311" title="机器学习算法的Python实现 (3)：决策树剪枝处理" strategy="BlogCommendFromBaidu" target="_blank">机器学习算法的Python实现 (3)：决策树剪枝处理</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/wzmsltw/article/details/51039928" title="机器学习算法的Python实现 (2)：ID3决策树" strategy="BlogCommendFromBaidu" target="_blank">机器学习算法的Python实现 (2)：ID3决策树</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/blogdevteam/article/details/75028508" title="CSDN日报20170712——《AI 大行其道，你准备好了吗？》" strategy="BlogCommendFromBaidu" target="_blank">CSDN日报20170712——《AI 大行其道，你准备好了吗？》</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/App_12062011/article/details/52136117" title="决策树（三）--完整总结（ID3，C4.5，CART,剪枝，替代）" strategy="BlogCommendFromBaidu" target="_blank">决策树（三）--完整总结（ID3，C4.5，CART,剪枝，替代）</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/crystal_tyan/article/details/42130851" title="决策树ID3;C4.5详解和python实现与R语言实现比较" strategy="BlogCommendFromBaidu" target="_blank">决策树ID3;C4.5详解和python实现与R语言实现比较</a>
+                                   </li>
+                            </ul>
+                              <ul class="similar_list fr">      
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/luoru/article/details/53589639" title="回归决策树" strategy="BlogCommendFromBaidu" target="_blank">回归决策树</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/Oliverkehl/article/details/50129999" title="逻辑回归，决策树，支持向量机 选择方案" strategy="BlogCommendFromBaidu" target="_blank">逻辑回归，决策树，支持向量机 选择方案</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/zhoubl668/article/details/50740177" title="【机器学习】迭代决策树GBRT（渐进梯度回归树）" strategy="BlogCommendFromBaidu" target="_blank">【机器学习】迭代决策树GBRT（渐进梯度回归树）</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/yuxiangyunei/article/details/50159609" title="逻辑回归、决策树和支持向量机的直观理解" strategy="BlogCommendFromBaidu" target="_blank">逻辑回归、决策树和支持向量机的直观理解</a>
+                                   </li>
+                                   <li>
+                                       <em>•</em>
+                                       <a href="http://blog.csdn.net/pipisorry/article/details/60776803" title="集成方法：渐进梯度回归树GBRT（迭代决策树）" strategy="BlogCommendFromBaidu" target="_blank">集成方法：渐进梯度回归树GBRT（迭代决策树）</a>
+                                   </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>   
+      
+</div>
+
+    <div>
+        
+
+        <script type="text/javascript">
+            /*博客内容页下方Banner1-728*90，创建于2016-12-13*/
+            var cpro_id = "u2843949";
+        </script>
+        <script type="text/javascript" src="http://cpro.baidustatic.com/cpro/ui/c.js"></script>
+
+     </div>
+
+<div id="suggest"></div>
+         <script  language="javascript" type='text/javascript'>     
+             $(function(){
+                 $.get("/suipingsp/svc/GetSuggestContent/42264413",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+        <dl class="blog-ass-articl tracking-ad" id="res-relatived" data-mod="popu_84"  > 
+             <dt><span>猜你在找</span></dt>    
+           
+    
+           
+
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/46" title="机器学习之概率与统计推断" strategy="undefined" target="_blank">机器学习之概率与统计推断</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/49" title="机器学习之数学基础" strategy="undefined" target="_blank">机器学习之数学基础</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/48" title="机器学习之凸优化" strategy="undefined" target="_blank">机器学习之凸优化</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/47" title="机器学习之矩阵" strategy="undefined" target="_blank">机器学习之矩阵</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/detail/421" title="响应式布局全新探索" strategy="undefined" target="_blank">响应式布局全新探索</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/detail/426" title="探究Linux的总线、设备、驱动模型" strategy="undefined" target="_blank">探究Linux的总线、设备、驱动模型</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/detail/422" title="深度学习基础与TensorFlow实践" strategy="undefined" target="_blank">深度学习基础与TensorFlow实践</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/45" title="深度学习之神经网络原理与实战技巧" strategy="undefined" target="_blank">深度学习之神经网络原理与实战技巧</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/43" title="前端开发在线峰会" strategy="undefined" target="_blank">前端开发在线峰会</a>
+                        </dd>
+                        <dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px; white-space: nowrap;">
+                             <a href="http://edu.csdn.net/huiyiCourse/series_detail/44" title="TensorFlow实战进阶：手把手教你做图像识别应用" strategy="undefined" target="_blank">TensorFlow实战进阶：手把手教你做图像识别应用</a>
+                        </dd>
+        </dl>
+
+
+
+
+            
+                                    
+            
+                                    
+
+        <!-- 广告位开始 -->
+        <!-- 广告位结束 -->
+
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list">
+    </div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form">
+    </div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+<script type="text/javascript">
+    var fileName = '42264413';
+    var commentscount = 5;
+    var islock = false
+</script>
+
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top"  style="bottom:60px;">
+
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="http://static.blog.csdn.net/images/blog-icon-reply.png" alt="快速回复">
+        </a>    
+    <a id="d-top-a" class="btn btn-top backtop"  style="display: none;" title="返回顶部" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_huidaodingbu'])" style="">         
+         <img src="http://static.blog.csdn.net/images/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+<script type="text/javascript">
+    $(function(){        
+        
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });         
+
+        },200);  
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },5000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },10000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },15000);
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+    var articletitle='机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树';
+
+</script>
+
+
+
+
+
+
+
+
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+               
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/suipingsp" target="_blank">
+    <img src="http://avatar.csdn.net/5/5/F/1_suipingsp.jpg" title="访问我的空间" style="max-width:90%"/>
+    </a>
+    <br />
+    <span><a href="http://my.csdn.net/suipingsp" class="user_name" target="_blank">suipingsp</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter"  title="[发私信]" onclick="window.open('http://msg.csdn.net/letters/model?receiver=suipingsp','_blank','height=350,width=700');_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_sixin'])"></a>  
+</div>
+<div id="blog_medal">
+                <div id="bms_box">
+                                            <a  target="_blank">
+                                                    <img src="http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/chizhiyiheng.png" onmouseover="m_over_m(this,4)" onmouseout="m_out_m()" alt="2" >
+                                            </a>
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>280447次</span></li>
+    <li>积分：<span>4698</span> </li>    
+    <li >等级： <span style="position:relative;display:inline-block;z-index:1" >
+            <img src="http://c.csdnimg.cn/jifen/images/xunzhang/jianzhang/blog5.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：4698 </div>
+        </span>  </li>
+    <li>排名：<span>第5941名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>78篇</span></li>
+    <li>转载：<span>5篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>76条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body" class="form_search">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search csdn-tracking-statistics" target="_blank"  data-mod="popu_306">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字" /></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog" />
+        <input type="hidden" name="q" id="inputQ" />
+        <input type="hidden" name="t" value="blog" />
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+
+   
+    $(function () {
+        $("#btnSubmit").unbind("click");
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {           
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            if ($("#inputSearch").val() == "") {               
+                alert("请录入搜索关键词！");                         
+                return false;
+            }
+            //var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";           
+            var url = "https://www.baidu.com/s?wd=" + encodeURIComponent($("#inputSearch").val()) + "%20site%3Ablog.csdn.net"
+            window.location.href = url;
+        }   
+    });
+</script><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>博客专栏</span></ul>
+    <ul class="panel_body" id="sp_column">
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/adan-chip.html" target="_blank"><img src="http://img.blog.csdn.net/20151123175921739" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/adan-chip.html" target="_blank">一站式了解智能终端处理器</a>
+    <p>文章：10篇</p>
+    <span>阅读：29361</span>
+    </td>
+    </tr></table>
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/adan-nucleus.html" target="_blank"><img src="http://img.blog.csdn.net/20151123175915677" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/adan-nucleus.html" target="_blank">Nucleus PLUS操作系统</a>
+    <p>文章：7篇</p>
+    <span>阅读：12706</span>
+    </td>
+    </tr></table>
+    </ul>
+</div><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="/suipingsp/article/category/2294461" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">项目管理</a><span>(17)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2294465" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">个人塑造和管理</a><span>(4)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2294485" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">操作系统</a><span>(7)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2294495" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">芯片架构</a><span>(11)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2294459" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">USB</a><span>(7)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2305427" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">杂记</a><span>(8)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2305451" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">前沿追踪</a><span>(4)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2311831" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">沟通和表达</a><span>(7)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2437889" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">虚拟化和云计算</a><span>(4)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2542835" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">编程语言</a><span>(14)</span>
+                </li>
+                 <li>
+                    <a href="/suipingsp/article/category/2749113" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">机器学习</a><span>(9)</span>
+                </li>
+</ul>
+</div><div id="panel_Archive" class="panel">
+<ul class="panel_head"><span>文章存档</span></ul>
+<ul class="panel_body">
+<div id="archive_list">
+<!--归档统计-->
+<li><a href="/suipingsp/article/month/2015/07">2015年07月</a><span>(1)</span></li><li><a href="/suipingsp/article/month/2015/06">2015年06月</a><span>(4)</span></li><li><a href="/suipingsp/article/month/2015/01">2015年01月</a><span>(1)</span></li><li><a href="/suipingsp/article/month/2014/12">2014年12月</a><span>(8)</span></li><li><a href="/suipingsp/article/month/2014/11">2014年11月</a><span>(1)</span></li><li><a href="/suipingsp/article/month/2014/10">2014年10月</a><span>(5)</span></li><li><a href="/suipingsp/article/month/2014/09">2014年09月</a><span>(8)</span></li><li><a href="/suipingsp/article/month/2014/08">2014年08月</a><span>(16)</span></li><li><a href="/suipingsp/article/month/2014/07">2014年07月</a><span>(14)</span></li><li><a href="/suipingsp/article/month/2014/06">2014年06月</a><span>(28)</span></li>
+</div>
+</ul>
+</div>
+<div id="hotarticls" class="panel tracking-ad" data-mod="popu_340">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="/suipingsp/article/details/41927247" title="机器学习经典算法详解及Python实现--决策树（Decision Tree）">机器学习经典算法详解及Python实现--决策树（Decision Tree）</a><span>(26758)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/42101139" title="机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法">机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法</a><span>(24880)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41645779" title="机器学习经典算法详解及Python实现--基于SMO的SVM分类器">机器学习经典算法详解及Python实现--基于SMO的SVM分类器</a><span>(17533)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41822313" title="机器学习经典算法详解及Python实现---Logistic回归（LR）分类器">机器学习经典算法详解及Python实现---Logistic回归（LR）分类器</a><span>(14560)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41722435" title="机器学习经典算法详解及Python实现--元算法、AdaBoost">机器学习经典算法详解及Python实现--元算法、AdaBoost</a><span>(11575)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41897901" title="机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用">机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用</a><span>(10399)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/42264413" title="机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树">机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树</a><span>(10300)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41964713" title="机器学习经典算法详解及Python实现--K近邻(KNN)算法">机器学习经典算法详解及Python实现--K近邻(KNN)算法</a><span>(10202)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/35574959" title="移动终端处理器构成和基带芯片概述">移动终端处理器构成和基带芯片概述</a><span>(6795)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/42495317" title="机器学习经典算法详解及Python实现--聚类及K均值、二分K-均值聚类算法">机器学习经典算法详解及Python实现--聚类及K均值、二分K-均值聚类算法</a><span>(5041)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel tracking-ad" data-mod="popu_341">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="/suipingsp/article/details/36643517" title="优秀员工的修炼-通往专家、管理之路">优秀员工的修炼-通往专家、管理之路</a><span>(10)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41964713" title="机器学习经典算法详解及Python实现--K近邻(KNN)算法">机器学习经典算法详解及Python实现--K近邻(KNN)算法</a><span>(7)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/33311561" title="不要让“知识”限制了你的思维">不要让“知识”限制了你的思维</a><span>(6)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/42264413" title="机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树">机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树</a><span>(5)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/42101139" title="机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法">机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法</a><span>(4)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/37693603" title="朋友，我不介意你赚我的钱">朋友，我不介意你赚我的钱</a><span>(4)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/38019207" title="自我实现型的人的五个特质">自我实现型的人的五个特质</a><span>(4)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41897901" title="机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用">机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用</a><span>(3)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/38556871" title="技术走向管理一些思考（2）-建立管理思维">技术走向管理一些思考（2）-建立管理思维</a><span>(3)</span>
+</li>
+<li>
+<a href="/suipingsp/article/details/41822313" title="机器学习经典算法详解及Python实现---Logistic回归（LR）分类器">机器学习经典算法详解及Python实现---Logistic回归（LR）分类器</a><span>(3)</span>
+</li>
+</ul>
+</div>
+<div id="homepageArticles" class="panel tracking-ad" data-mod="popu_4">
+<ul class="panel_head"><span>推荐文章</span></ul>
+<ul class="panel_body" id="ad_commend">
+<ul>
+<li><a href="http://blog.csdn.net/blogdevteam/article/details/75116901" target="_blank">* CSDN日报20170714——《从创业到再就业，浅述对程序员职业生涯的看法》</a></li>
+<li><a href="http://blog.csdn.net/jiangwei0910410003/article/details/74886918" 
+target="_blank">* Android 逆向 | 锁屏密码算法解析以及破解方案</a></li>
+<li><a href="http://blog.csdn.net/hopeztm/article/details/75201823"target="_blank">* 从单一WAR到多活，记述一个创业公司的架构演变</a></li>
+<li><a href="http://blog.csdn.net/sileixinhua/article/details/75203725" 
+target="_blank">* 我的AI转型之路与AI之我见（非985211的奋斗路程与视角）</a></li>
+<li><a href="http://blog.csdn.net/u013709270/article/details/74892124" 
+target="_blank">* AI大行其道，你准备好了吗？—谨送给徘徊于转行AI的程序员</a></li>
+<li><a href="http://blog.csdn.net/chancein007/article/details/74943322" 
+target="_blank">* AI转型中的思考和洞见</a></li>
+
+</ul></ul>
+</div>
+
+
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="/suipingsp/article/details/41822313#comments">机器学习经典算法详解及Python实现---Logistic回归（LR）分类器</a>
+    <p style="margin:0px;"><a href="/u010758942" class="user_name">u010758942</a>:
+有没有代码
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/41964713#comments">机器学习经典算法详解及Python实现--K近邻(KNN)算法</a>
+    <p style="margin:0px;"><a href="/z_dianjun" class="user_name">z_dianjun</a>:
+voteIlabel = labels[sortedDistIndicies  这行代码有些不理解，...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/41897901#comments">机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用</a>
+    <p style="margin:0px;"><a href="/lanyanfeishu" class="user_name">lanyanfeishu</a>:
+赞同博主的说法，计算最终的分类概率时，没有考虑不存在时的概率，而是通过词向量和log后的概率相乘，如...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/42264413#comments">机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树</a>
+    <p style="margin:0px;"><a href="/mo__kun" class="user_name">mo__kun</a>:
+博主给的代码链接打不开。。。
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/42264413#comments">机器学习经典算法详解及Python实现--CART分类决策树、回归树和模型树</a>
+    <p style="margin:0px;"><a href="/mo__kun" class="user_name">mo__kun</a>:
+博主给的代码链接打不开。。。
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/41927247#comments">机器学习经典算法详解及Python实现--决策树（Decision Tree）</a>
+    <p style="margin:0px;"><a href="/xixiddd" class="user_name">xixiddd</a>:
+感谢博主分享。
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/42101139#comments">机器学习经典算法详解及Python实现--线性回归（Linear Regression）算法</a>
+    <p style="margin:0px;"><a href="/zhonglj0314" class="user_name">zhonglj0314</a>:
+训练集样本数据是什么？
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/42101139#comments">机器学习经典算法详解及Python实现---朴素贝叶斯分类及其在文本分类、垃圾邮件检测中的应用</a>
+    <p style="margin:0px;"><a href="/capecape" class="user_name">capecape</a>:
+同意
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/42101139#comments">机器学习经典算法详解及Python实现--K近邻(KNN)算法</a>
+    <p style="margin:0px;"><a href="/huhaobin_25" class="user_name">huhaobin_25</a>:
+Mark
+    </p>
+    </li>
+    <li>
+   
+         <a href="/suipingsp/article/details/36643517#comments">优秀员工的修炼-通往专家、管理之路</a>
+    <p style="margin:0px;"><a href="/suipingsp" class="user_name">suipingsp</a>:
+@huan0g:在管理着一个公司
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+
+                   <!-- 广告位开始 -->                    <!-- 广告位结束 -->
+                   <div class="tracking-ad" data-view="true"  data-mtp="63" data-order="40" data-con="ad_content_1260" style="width: 200px; height: 500px;">
+                         <div id="nav_show_top_stop" style="width: 200px;height: 500px;z-index:1000"><div id="cpro_u2734128"></div>
+                             <div id="cpro_u3031287"></div></div>
+                   </div>
+    <script type="text/javascript">
+        setTimeout(function () {
+            var naviga_offsetTop = 0;
+            function naviga_stay_top() { var scrollTop = jQuery(document).scrollTop(); if (scrollTop > naviga_offsetTop) { jQuery("#nav_show_top_stop").css({ "position": "fixed" }); jQuery("#nav_show_top_stop").css({ "top": "0px" }); } else { jQuery("#nav_show_top_stop").css({ "position": "fixed" }); jQuery("#nav_show_top_stop").css({ "top": naviga_offsetTop - scrollTop + "px" }); } }
+            function onload_function() { naviga_offsetTop = jQuery("#nav_show_top_stop").position().top; jQuery(window).bind("scroll", naviga_stay_top); jQuery(window).bind("mousewheel", naviga_stay_top); jQuery(document).bind("scroll", naviga_stay_top); jQuery(document).bind("mousewheel", naviga_stay_top); } jQuery(document).ready(onload_function);
+
+        }, 200);
+    </script>
+<script type="text/javascript">(window.cproArray = window.cproArray || []).push({ id: "u2734128" });  </script> 
+                    <script src="http://cpro.baidustatic.com/cpro/ui/c.js" type="text/javascript"></script> 
+                   <script type="text/javascript">
+                       /*PC端-博客内容页左侧Button2-200*200-2017/7/10*/
+                       (window.cproArray = window.cproArray || []).push({ id: "u3031287" });
+</script>
+<script type="text/javascript" src="http://cpro.baidustatic.com/cpro/ui/c.js"></script>
+
+           </div>   
+
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="http://passport.csdn.net/content/loginbox/login.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='tracking-ad' data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                    + "<span class='tracking-ad' data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+
+    </div>
+      <!--new top-->
+    
+
+     
+
+   
+        <!--new top-->
+   
+   
+
+    
+    
+    
+   
+
+   
+
+
+       <script type="text/javascript" src="http://static.blog.csdn.net/public/res/bower-libs/MathJax/MathJax.js?config=TeX-AMS_HTML"></script>
+          <script type="text/javascript">
+              //$(function () {
+              //    setTimeout(function () {
+              //        var searchtitletags = articletitle + ',' + $("#tags").html();
+              //        searchService({
+              //            index: 'blog',
+              //            query: searchtitletags,
+              //            from: 5,
+              //            size: 5,
+              //            appendTo: '#res',
+              //            url: 'recommend',
+              //            his: 2,
+              //            client: "blog_cf_enhance",
+              //            tmpl: '<dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;"><a href="#{ url }" title="#{ title }" strategy="#{ strategy }">#{ title }</a></dd>'
+              //        });
+              //    }, 1000);
+              //});
+
+         </script>
+    
+    <script src="http://static.blog.csdn.net/scripts/csdn_blog_detail.min.js" type="text/javascript"></script>
+        
+    <script type="text/javascript" src="http://c.csdnimg.cn/blog/csdn_public_blog_detail.min.js?20170626001"></script>
+
+    <script type="text/javascript" src="http://medal.blog.csdn.net/showblogmedal.ashx?blogid=3247803"></script>
+
+     
+    
+
+
+  <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+                    <script id="adJs52b5334"></script>
+                    <script>document.getElementById("adJs52b5334").src = "http://ads.csdn.net/js/opt/52b5334.js?t=" + Math.random();</script>
+   </div>
+
+    
+    
+        
+     
+
+    
+          
+    <div class="pop_CA_cover"  style="display:none"></div>
+    <div class="pop pop_CA"  style="display:none">
+          <div class="CA_header">
+            收藏助手
+            <span class="cancel_icon"  id="fapancle"  onclick="$('.pop_CA').hide();$('.pop_CA_cover').hide();"></span>
+          </div>
+          <iframe src="" id="fa" frameborder="0" width="100%" height="360"  scrolling="no" ></iframe>
+    </div>
+
+
+        <script type="text/javascript">
+
+            $(function () {
+                var fromjs = $("#fromjs");
+                if (fromjs.length > 0) {
+                    $("#fromjs .markdown_views pre").addClass("prettyprint");
+                    prettyPrint();
+
+                    $('pre.prettyprint code').each(function () {
+                        var lines = $(this).text().split('\n').length;
+                        var $numbering = $('<ul/>').addClass('pre-numbering').hide();
+                        $(this).addClass('has-numbering').parent().append($numbering);
+                        for (i = 1; i <= lines; i++) {
+                            $numbering.append($('<li/>').text(i));
+                        };
+                        $numbering.fadeIn(1700);
+                    });
+
+                    $('.pre-numbering li').css("color", "#999");
+                }
+            });
+
+            $(".markdown_views a[target!='_blank']").attr("target", "_blank");
+
+            //$(".toc a[target='_blank']").attr("target", "");
+
+            setTimeout(function () {
+                $(".toc a[target='_blank']").attr("target", "");
+            }, 500);
+
+        </script>
+
+</body>
+</html>   
