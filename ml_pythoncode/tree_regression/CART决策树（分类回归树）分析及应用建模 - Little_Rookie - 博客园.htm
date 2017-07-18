@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CART决策树（分类回归树）分析及应用建模 - Little_Rookie - 博客园</title>
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=m_FXmwz3wxZoecUwNEK23PAzc-j9vbX_C6MblJ5ouMc1"/>
+<link id="MainCss" type="text/css" rel="stylesheet" href="/skins/LessIsMore/bundle-LessIsMore.css?v=0F7NKnmmVYJDCp-KQ2sA7Dn1GREfDmWWyNjiJP9YrzE1"/>
+<link id="mobile-style" media="only screen and (max-width: 768px)" type="text/css" rel="stylesheet" href="/skins/LessIsMore/bundle-LessIsMore-mobile.css?v=cQ0AaHqux6aS-vMMd5oSAg-U2pDq7j57NMONaWzYbBM1"/>
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/nxld/rss"/>
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/nxld/rsd.xml"/>
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/nxld/wlwmanifest.xml"/>
+<script src="//common.cnblogs.com/script/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'nxld', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="/bundles/blog-common.js?v=E1-LyrzANB2jbN9omtnpOHx3eU0Kt3DyislfhU0b5p81" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+		
+<!--done-->
+<div class="title"><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/nxld/">Little_Rookie</a></div>
+<div class="subtitle"></div>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li id="nav_sitehome"><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a></li>
+<li id="nav_myhome"><a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/nxld/">首页</a></li>
+<li id="nav_newpost"><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li id="nav_contact"></li>
+<li id="nav_rss">
+<!----></li>
+<li id="nav_admin"><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+</ul>
+
+		<div class="blogStats">
+			
+			
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class = "post">
+		<h1 class = "postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="http://www.cnblogs.com/nxld/p/6170931.html">CART决策树（分类回归树）分析及应用建模</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body"><p><strong>一、CART决策树模型概述</strong>（Classification And Regression Trees）</p>
+<p>　　<span lang="EN-US">&nbsp;&nbsp;<span lang="EN-US">决策树是使用类似于一棵树的结构来表示类的划分，树的构建可以看成是变量（属性）选择的过程，内部节点表示树选择那几个变量（属性）作为划分，每棵树的叶节点表示为一个类的标号，树的最顶层为根节点。</span></span></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;决策树是<span style="background-color: #ffff00"><strong>通过一系列规则对数据进行分类</strong></span>的过程。它提供一种在什么条件下会得到什么值的类似规则的方法。​​决策树算法属于有指导的学习，即原数据必须包含<strong><span style="background-color: #ff0000">预测变量和目标变量</span>。</strong><strong>决策树分为<span style="background-color: #ffff00">分类决策树（目标变量为分类型数值）和回归决策树（目标变量为连续型变量）</span>。</strong>分类决策树叶节点所含样本中，其输出变量的众数就是分类结果；回归树的叶节点所含样本中，其输出变量的平均值就是预测结果。​&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 决策树是一种倒立的树结构，它由内部节点、叶子节点和边组成。其中最上面的一个节点叫根节点。 构造一棵决策树需要一个训练集，一些例子组成，每个例子用一些属性（或特征）和一个类别标记来描述。构造决策树的目的是找出属性和类别间的关系，一旦这种关系找出，就能用它来预测将来未知类别的记录的类别。这种具有预测功能的系统叫决策树分类器。</p>
+<p><strong>决策树有非常良好的优点：</strong></p>
+<p>1）决策树的够造不需要任何领域知识，就是简单的IF...THEN...思想 ；</p>
+<p>2）决策树能够很好的处理高维数据，并且能够筛选出重要的变量；</p>
+<p>3）由决策树产生的结果是易于理解和掌握的；</p>
+<p>4）决策树在运算过程中也是非常迅速的；</p>
+<p>5）一般而言，决策树还具有比较理想的预测准确率。</p>
+<p><strong>CART决策树又称分类回归树</strong>，当数据集的因变量为连续性数值时，该树算法就是一个回归树，可以用叶节点观察的均值作为预测值；当数据集的因变量为离散型数值时，该树算法就是一个分类树，可以很好的解决分类问题。<strong>但需要注意的是，该算法是一个二叉树</strong>，即每一个非叶节点只能引伸出两个分支，所以当某个非叶节点是多水平(2个以上)的离散变量时，该变量就有可能被多次使用。</p>
+<p><strong>决策树算法中包含最核心的两个问题</strong>，即<span style="font-size: 18px"><span style="background-color: #ff0000; color: #000000"><strong>特征选择和剪枝</strong></span>：</span></p>
+<p>关于特征选择目前比较流行的方法是<strong>信息增益、增益率、基尼系数和卡方检验</strong>，下文就先介绍基于基尼系数的特征选择，因为本文所描述的CART决策树就是基于基尼系数选择特征的；</p>
+<p>关于剪枝问题，主要分<strong>预剪枝和后剪枝</strong>，预剪枝是在树还没有生长之前就限定了树的层数、叶节点观测数量等，而后剪枝是在树得到充分生长后，基于损失矩阵或复杂度方法实施剪枝，下文将采用后剪枝的方法对树进行修正。</p>
+<p><strong>二、决策树的核心问题</strong></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 决策树核心问题有二：一是利用Training Data完成决策树的生成过程；二是利用Testing Data完成对决策树的精简过程。即前面我们提到的，生成的推理规则往往过多，精简是必需的。</p>
+<p><strong>1）决策树的生长</strong></p>
+<p>决策树生长过程的本质是对Training Data反复分组（分枝）的过程，当数据分组（分枝）不再有意义——注意，什么叫分组不再有意义——时，决策树生成过程停止。<strong>因此，决策树生长的核心算法是确定数据分析的标准，即分枝标准。</strong></p>
+<p>何为有意义呢？注意，当决策树分枝后结果差异不再显著下降，则继续分组没有意义。也就是说，我们分组的目的，是为了让输出变量在差异上尽量小，到达叶节点时，不同叶节点上的输出变量为相同类别，或达到用户指定的决策树停止生成的标准。</p>
+<p>这样，分枝准则涉及到两方面问题：1、如果从众多输入变量中选择最佳分组变量；2、如果从分组变量的众多取值中找到最佳分割点。不同的决策树算法，如C4.5、C5.0、Chaid、Quest、Cart采用了不同策略。</p>
+<p><strong>​2）决策树的修剪</strong></p>
+<p>完整的决策树并不是一棵分类预测新数据对象的最佳树。其原因是完整的决策树对Training Data描述过于“精确”。我们知道，随着决策树的生长，决策树分枝时所处理的样本数量在不断减少，决策树对数据总体珠代表程度在不断下降。在对根节点进行分枝时，处理的是全部样本，再往下分枝，则是处理的不同分组下的分组下的样本。可见随着决策树的生长和样本数量的不断减少，越深层处的节点所体现的数据特征就越个性化，可能出现如上推理规则：“年收入大于50000元且年龄大于50岁且姓名叫张三的人购买了此产品”。这种过度学习从而精确反映Training Data特征，失去一般代表性而无法应用于新数据分类预测的现象，叫<strong>过度拟合（Overfitting）或过度学习</strong>。那我们应该怎么办呢？修剪！</p>
+<p>常用的修剪技术有<strong>预修剪（Pre-Pruning）</strong>和<strong>后修剪（Post-Pruning）。</strong></p>
+<p>Pre-Pruning可以事先指定决策树的最大深度，或最小样本量，以防止决策树过度生长。前提是用户对变量聚会有较为清晰的把握，且要反复尝试调整，否则无法给出一个合理值。注意，决策树生长过深无法预测新数据，生长过浅亦无法预测新数据。</p>
+<p>Post-pruning是一个边修剪边检验的过程，即在决策树充分生长的基础上，设定一个允许的最大错误率，然后一边修剪子树，一边计算输出结果的精度或误差。当错误率高于最大值后，立即停止剪枝。</p>
+<p><strong>基于Training Data（训练集）的Post-Pruning（剪枝）应该使用Testing Data（测试集）。</strong></p>
+<p>决策树中的C4.5、C5.0、CHAID、CART和QUEST都使用了不同 剪枝策略。</p>
+<p><strong>案例、使用rpart()回归树​分析糖尿病的血液化验指标</strong></p>
+<p>install.packages("rpart")​</p>
+<p>library("rpart")​​</p>
+<p>install.packages("rpart.plot")</p>
+<p>library(rpart.plot)​</p>
+<p><strong>1、主要应用函数：</strong></p>
+<p><strong>1）构建回归树的函数：rpart（）</strong></p>
+<p><strong>rpart(formula, data, weights, subset,na.action = na.rpart, method,</strong></p>
+<p><strong>model = FALSE, x = FALSE, y = TRUE, parms, control, cost, ...)</strong></p>
+<p>主要参数说明:</p>
+<p><strong>fomula：<span style="background-color: #ffffff; color: #ff0000">回归方程形式:例如 y～x1+x2+x3</span></strong>。</p>
+<p><strong>data：</strong>数据:包含前面方程中变量的数据框(dataframe)。</p>
+<p><strong>na.action：</strong>缺失数据的处理办法:默认办法是删除因变量缺失的观测而保留自变量缺失的观测。</p>
+<p><strong>method：</strong><strong>根据树末端的数据类型选择相应变量分割方法</strong>,本参数有四种取值:<strong>连续型“anova”;离散型“class”;计数型(泊松过程)“poisson”;生存分析型“exp”。</strong>程序会根据因变量的类型自动选择方法,但一般情况下最好还是指明本参数,以便让程序清楚做哪一种树模型。​</p>
+<p><strong>parms：</strong>用来设置三个参数:<strong>先验概率、损失矩阵、分类纯度的度量方法。​</strong></p>
+<p><strong>cost：</strong>损失矩阵，在剪枝的时候，叶子节点的加权误差与父节点的误差进行比较，考虑损失矩阵的时候，从将“减少-误差”调整为“减少-损失”</p>
+<p><strong>control：</strong>控制每个节点上的最小样本量、交叉验证的次数、复杂性参量:即cp:complexitypamemeter,这个参数意味着对每一步拆分,模型的拟合优度必须提高的程度,等等。​​rpart.control对树进行一些设置</p>
+<p>xval是10折交叉验证</p>
+<p>minsplit是最小分支节点数，这里指大于等于20，那么该节点会继续分划下去，否则停止</p>
+<p>minbucket：叶子节点最小样本数；maxdepth：树的深度</p>
+<p>cp全称为complexity parameter，指<strong>某个点的复杂度</strong>，对每一步拆分,模型的拟合优度必须提高的程度，用来节省剪枝浪费的不必要的时间。</p>
+<p><strong>2）进行剪枝的函数：prune()</strong></p>
+<p><strong>prune(tree, cp, ...)</strong></p>
+<p>主要参数说明:</p>
+<p>tree：一个回归树对象,常是rpart()的结果对象。</p>
+<p>cp：复杂性参量,指定剪枝采用的阈值。cp全称为complexity parameter，指某个点的复杂度，对每一步拆分,模型的拟合优度必须提高的程度，用来节省剪枝浪费的不必要的时间。​</p>
+<p><strong>二、特征选择</strong></p>
+<p><strong>CART算法的特征选择就是基于基尼系数得以实现的</strong>，其选择的标准就是每个子节点达到最高的纯度，即落在子节点中的所有观察都属于同一个分类。下面简单介绍一下有关基尼系数的计算问题：</p>
+<p>假设数据集D中的因变量有m个水平，即数据集可以分成m类群体，则数据集D的基尼系数可以表示为：</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzRzoVxOUUjGhbiahmZBmWgCPMj1apQjia8B1WJv0pgjDW6PD8UyTq8VDQ/640?wx_fmt=png" alt="" data-ratio="0.1125" data-s="300,640" data-type="png" data-w="640"><br><strong>由于CART算法是二叉树形式，所以一个多水平(m个水平)的离散变量（自变量）可以把数据集D划分为2^m-2种可能</strong>。举个例子也许能够明白：如果年龄段可分为{青年，中年，老年}，则其子集可以是{青年，中年，老年}、{青年，中年}、{青年，老年}、{中年，老年}、{青年}、{中年}、{老年}、{}。其中{青年，中年，老年}和空集{}为无意义的Split，所以6=2^3-2。</p>
+<p>对于一个离散变量来说，需要计算每个分区不纯度的加权和，即对于变量A来说，D的基尼系数为：</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzgFRbtPhR6icqia30DSUfobJCs13OLkXMELuoZOQnx3u4iaWbAKmYQg77w/640?wx_fmt=png" alt="" data-ratio="0.13703703703703704" data-s="300,640" data-type="png" data-w="540"></p>
+<p>对于一个连续变量来说，需要将排序后的相邻值的中点作为阈值（分裂点），同样使用上面的公式计算每一个分区不纯度的加权和。</p>
+<p>&nbsp;</p>
+<p>根据特征选择的标准，只有使每个变量的每种分区的基尼系数达到最小，就可以确定该变量下的阈值作为分裂变量和分裂点。如果这部分读的不易理解的话，<strong>可参考《数据挖掘：概念与技术》一书，书中有关于计算的案例</strong>。</p>
+<p>&nbsp;</p>
+<p><strong>三、剪枝</strong></p>
+<p><strong>剪枝是为了防止模型过拟合，而更加适合样本外的预测。</strong>一般决策树中的剪枝有两种方式，即预剪枝和后剪枝，而后剪枝是运用最为频繁的方法。后剪枝中又分为损失矩阵剪枝法和复杂度剪枝法，对于损失矩阵剪枝法而言，是为了给错误预测一个惩罚系数，使其在一定程度上减少预测错误的情况；对于复杂度剪枝法而言，就是把树的复杂度看作叶节点的个数和树的错误率（错误分类观察数的比例）的函数。这里讲解的有点抽象，下面我们通过一个简单的例子来说明后剪枝的作用。</p>
+<p>&nbsp;</p>
+<p><strong>四、案例分享</strong></p>
+<p>以“知识的掌握程度”数据为例，说说决策树是如何实现数据的分类的(数据来源</p>
+<p>：http://archive.ics.uci.edu/ml/datasets/User+Knowledge+Modeling)。</p>
+<p>该数据集通过5个维度来衡量知识的掌握程度，它们分别是：</p>
+<p><strong>STG</strong>：目标科目的学习时长程度；&nbsp;</p>
+<p><strong>SCG</strong>：对目标科目的重复学习程度；&nbsp;</p>
+<p><strong>STR</strong>：其他相关科目的学习时长程度；</p>
+<p><strong>LPR</strong>：其他相关科目的考试成绩；&nbsp;</p>
+<p><strong>PEG</strong>：目标科目的考试成绩。&nbsp;</p>
+<p>知识的掌握程度用UNS表示，它有4个水平，即Very Low、Low、Middle、High。</p>
+<p>&nbsp;</p>
+<p>#读取外部文件</p>
+<p>Train &lt;- read.csv(file = file.choose())</p>
+<p>Test &lt;- read.csv(file = file.choose())</p>
+<p>#加载CART算法所需的扩展包，并构建模型</p>
+<p>library(rpart)</p>
+<p>fit &lt;- rpart(UNS ~ ., data = Train)</p>
+<p>#查看模型输出的规则</p>
+<p>fit</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzomKOUUcicT6zJ9JpUMkjtTd1dc5mFuic3SV9fIvZJibx9gYoFsRz5VpmA/640?wx_fmt=png" alt="" data-ratio="0.375" data-s="300,640" data-type="png" data-w="640"><br><br></p>
+<p>上面的输出规则看起来有点眼花缭乱，我们<strong>尝试用决策树图</strong>来描述产生的具体规则。由于rpart包中有plot函数实现决策树图的绘制，但其显得很难看，我们下面<strong>使用rpart.plot包来绘制</strong>比较好看的决策树图：</p>
+<p>#加载并绘制决策树图</p>
+<p>library(rpart.plot)</p>
+<p>rpart.plot(fit, branch = 1, branch.type = 1, type = 2, extra = 102,shadow.col='gray', box.col='green',border.col='blue', split.col='red',main="CART决策树")</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzUSVDADEownC6icuYickWdfwDgXYA8ibtPYCMZkIr3GhPE2UTCbQzvS7yw/640?wx_fmt=png" alt="" data-ratio="0.9981916817359855" data-s="300,640" data-type="png" data-w="553"><br>上图可<strong>一目了然的查看具体的输出规则</strong>，如根节点有258个观测，其中Middle有88个，当PEG&gt;=0.68时，节点内有143个观测，其中Middle有78个，当PEG&gt;=0.12且PEG&lt;0.34时，节点内有115个观察，其中Low有81个，以此类推还可以得出其他规则。</p>
+<p>&nbsp;</p>
+<p>#将模型用于预测</p>
+<p>Pred &lt;- predict(object = fit, newdata = Test[,-6], type = 'class')</p>
+<p>#构建混淆矩阵</p>
+<p>CM &lt;- table(Test[,6], Pred)</p>
+<p>CM</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzKLiau3b4qY1cGZnL7eFH9OfDRNrqIabIumhQxtDRE6BwK5eLCtHgohA/640?wx_fmt=png" alt="" data-ratio="0.3127962085308057" data-s="300,640" data-type="png" data-w="422"><br>#计算模型的预测准确率</p>
+<p>Accuracy &lt;- sum(diag(CM))/sum(CM)</p>
+<p>Accuracy</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgz1kXVvYVZSvlAicsSgJA2Y4l9lHPJp5ZSf6gcqvMVWyTbicbEZpKZh4TA/640?wx_fmt=png" alt="" data-ratio="0.09223300970873786" data-s="300,640" data-type="png" data-w="412"><br>结果显示，模型在测试集中的预测能力超过91%。<strong>但模型的预测准确率还有提升的可能吗？</strong>下面我们对模型进行剪枝操作，具体分损失矩阵法剪枝和复杂度剪枝：</p>
+<p>根据混淆矩阵的显示结果，发现High的预测率达100%(39/39)，Low的预测率达91.3%(42/46)，Middle的预测率达88.2%(30/34)，very_low的预测率达80.8(21/26)。<strong>如果希望提升very_low的预测准确率的话就需要将其惩罚值提高</strong>，经尝试调整，构建如下<strong>损失矩阵</strong>：</p>
+<p>vec = c(0,1,1,1,1,0,1,1,1,2,0,1,1,3.3,1,0)</p>
+<p>cost = matrix(vec, nrow = 4, byrow = TRUE)</p>
+<p>cost</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgz4s6CnYm1STQQFKQKsdRZED3mcANh6TP8Cndv78H5AhKLYZGcbToukA/640?wx_fmt=png" alt="" data-ratio="0.2268041237113402" data-s="300,640" data-type="png" data-w="582"><br>fit2 = rpart(UNS ~ ., data = Train, parms = list(loss = cost))</p>
+<p>Pred2 = predict(fit2, Test[,-6], type = 'class')</p>
+<p>CM2 &lt;- table(Test[,6], Pred2)</p>
+<p>CM2</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzd6iaIsXqozO9YHdzlbib8LRQYAPdMuvvc9DxHPVG1H8DWs8l32wZxe2A/640?wx_fmt=png" alt="" data-ratio="0.28440366972477066" data-s="300,640" data-type="png" data-w="436"><br>Accuracy2 &lt;- sum(diag(CM2))/sum(CM2)</p>
+<p>Accuracy2</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzLZzDS9icoCCicnOiblsxuUGKiajjFs2cvv5SIJia8picDaAAMNf2icUvgDxVA/640?wx_fmt=png" alt="" data-ratio="0.13119533527696792" data-s="300,640" data-type="png" data-w="343"><br><strong>准确率提升了1.4%</strong>，且在保证High、Low、Middle准确率不变的情况下，提升了very_low的准确率88.5%，原来为80.8%。</p>
+<p>下面再采用<strong>复杂度方法进行剪枝</strong>，先来看看原模型的CP值:</p>
+<p>printcp(fit)</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzrU2DpbfMje8uYqamTKVKSBnkXZbBRkKcJwOhH18WZodmDOyZCGRxCQ/640?wx_fmt=png" alt="" data-ratio="0.6381322957198443" data-s="300,640" data-type="png" data-w="514"><br><br></p>
+<p><strong>复杂度剪枝法满足的条件是</strong>，在预测误差(xerror)尽量小的情况下（不一定是最小值，而是允许最小误差的一个标准差(xstd)之内），选择尽量小的cp值。<strong>这里选择cp=0.01。</strong></p>
+<p>fit3 = prune(fit, cp = 0.01)</p>
+<p>Pred3 = predict(fit3, Test[,-6], type = 'class')</p>
+<p>CM3 &lt;- table(Test[,6], Pred3)</p>
+<p>CM3</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgzcrQaXoWQ6PON7Sc4rjKUwgNkGEfUGgmmiccgJ5R9GN6ibaCjcB2AvoIQ/640?wx_fmt=png" alt="" data-ratio="0.337696335078534" data-s="300,640" data-type="png" data-w="382"><br>Accuracy3 &lt;- sum(diag(CM3))/sum(CM3)</p>
+<p>Accuracy3</p>
+<p><img src="http://read.html5.qq.com/image?src=forum&amp;q=5&amp;r=0&amp;imgflag=7&amp;imageUrl=http://mmbiz.qpic.cn/mmbiz/yjFUicxiaClgVLsG5AzghDsH1usI4icfibgziaCVOE6offgtS0ic629bWeWY9x55VVqxoh0Jffbwe0DO9kibtSb7xhtIA/640?wx_fmt=png" alt="" data-ratio="0.1111111111111111" data-s="300,640" data-type="png" data-w="342"><br>很显然，<strong>模型的准确率并没有得到提升</strong>，因为这里满足条件的cp值为0.01，而函数rpart()默认的cp值就是0.01，故模型fit3的结果与fit一致。</p>
+<p>确定递归建树的<strong>停止条件</strong>：否则会使节点过多，导致过拟合。</p>
+<p>1.&nbsp;每个子节点只有一种类型的记录时停止，这样会使得节点过多，导致过拟合。</p>
+<p>2.&nbsp;<strong>可行方法</strong>：当前节点中的记录数低于一个阈值时，那就停止分割。</p>
+<p><strong>过拟合原因</strong>：</p>
+<p>（1）噪音数据，某些节点用噪音数据作为了分割标准。</p>
+<p>（2）缺少代表性的数据，训练数据没有包含所有具有代表性的数据，导致某类数据无法很好匹配。</p>
+<p>（3）还就是上面的停止条件设置不好。</p>
+<p>转载于：<a href="http://chuansong.me/n/540927751643" target="_blank">http://chuansong.me/n/540927751643</a></p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info">
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"></div>
+</div>
+
+
+		</div>
+		<div class = "postDesc">posted @ <span id="post-date">2016-12-13 18:01</span> <a href='http://www.cnblogs.com/nxld/'>Little_Rookie</a> 阅读(<span id="post_view_count">...</span>) 评论(<span id="post_comment_count">...</span>)  <a href ="https://i.cnblogs.com/EditPosts.aspx?postid=6170931" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(6170931);return false;">收藏</a></div>
+	</div>
+	<script type="text/javascript">var allowComments=true,cb_blogId=316694,cb_entryId=6170931,cb_blogApp=currentBlogApp,cb_blogUserGuid='ddeae8d9-a9a8-e611-845c-ac853d9f53ac',cb_entryCreatedDate='2016/12/13 18:01:00';loadViewCount(cb_entryId);</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id='comment_form' class='commentform'>
+<a name='commentform'></a>
+<div id='divCommentShow'></div>
+<div id='comment_nav'><span id='span_refresh_tips'></span><a href='javascript:void(0);' onclick='return RefreshCommentList();' id='lnk_RefreshComments' runat='server' clientidmode='Static'>刷新评论</a><a href='#' onclick='return RefreshPage();'>刷新页面</a><a href='#top'>返回顶部</a></div>
+<div id='comment_form_container'></div>
+<div class='ad_text_commentbox' id='ad_text_under_commentbox'></div>
+<div id='ad_t2'></div>
+<div id='opt_under_post'></div>
+<div id='cnblogs_c1' class='c_ad_block'></div>
+<div id='under_post_news'></div>
+<div id='cnblogs_c2' class='c_ad_block'></div>
+<div id='under_post_kb'></div>
+<div id='HistoryToday' class='c_ad_block'></div>
+<script type='text/javascript'>
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+			<div id="calendar"><div id="blog-calendar" style="display:none"></div><script type="text/javascript">loadBlogDefaultCalendar();</script></div>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright &copy;2017 Little_Rookie
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+</body>
+</html>
