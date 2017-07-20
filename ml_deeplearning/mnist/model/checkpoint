@@ -1,2 +1,6 @@
-model_checkpoint_path: "model.ckpt"
-all_model_checkpoint_paths: "model.ckpt"
+model_checkpoint_path: "mnist.ckpt-29001"
+all_model_checkpoint_paths: "mnist.ckpt-25001"
+all_model_checkpoint_paths: "mnist.ckpt-26001"
+all_model_checkpoint_paths: "mnist.ckpt-27001"
+all_model_checkpoint_paths: "mnist.ckpt-28001"
+all_model_checkpoint_paths: "mnist.ckpt-29001"

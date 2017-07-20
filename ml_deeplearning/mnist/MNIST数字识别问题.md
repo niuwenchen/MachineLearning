@@ -109,3 +109,78 @@ tf.train.Saver()
     graph_def属性
     主要记录了TF计算图上的节点信息，每一个节点对应了TF的一个运算，meta_info_def中已经包含了所有运算的具体信息，所以graph_def属性
     只关注运算的链接结构
+    
+    
+### 最佳实践样例
+
+本节将介绍一个TF训练神经网络模型的最佳实践。将训练和测试分成两个独立的程序，这可以使得每一个组件更加灵活。比如训练神经网络的程序可以持续输出训练好的模型，而测试程序可以每个一段时间检验最新模型的正确率，比如模型效果更好，
+则将这个模型提供给产品使用。除了将不同功能模块分开，还将前向传播的过程抽象成一个单独的库函数。
+
+前向模型没有什么疑惑的，就是一个神经网络前向计算的过程，主要是声明了两个层次，隐藏层和输出层； 主要一个是在这个里面增加了
+参数weight和biase初始化的过程。那么这两个变量就在这里被初始化了，后面执行什么操作和这个前向网络无关，也就是说，再次执行
+inference操作获取输出值和第一次初始化有关，但是后面这两个值都发生了改变，到底是谁在改变它？就是BP层。
+
+训练层: 定义训练过程，并不定义准确率，准确率涉及到了验证，这里只关注在训练的过程中出现的参数，也就是损失函数loss
+
+采用交叉熵
+
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, tf.argmax(y_, 1))
+    cross_entropy_mean = tf.reduce_mean(cross_entropy)
+    loss = cross_entropy_mean + tf.add_n(tf.get_collection("losses"))
+
+然后用步长变化lambda也就是学习率利用随机梯度下降法去优化这个loss，使loss最小
+
+    train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss, global_step=global_step)
+    
+执行真正运行操作
+
+    需要执行train_step 去更新参数，去执行滑动操作去平均参数，去执行loss去获取损失值
+    保存这个会话，这个会话中有什么？ 知道的就是四个参数和对应的影子变量
+    那么验证过程需要什么，也就是这四个参数，用这四个参数去实施计算过程。
+    
+验证过程
+
+我们假定现在已经有四个变量weight，biases，如何验证，加载验证数据，执行验证操作，评价标准是accuracy
+
+    y=mnist_inference.inference(x,None)
+    correct_prediction = tf.equal(tf.argmax(y,1),tf.argmax(y_,1))
+    accuracy=tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+    
+这只是流程，还未执行，也就代表还未加载四个变量，现在从model中加载四个变量，用一个简单的方式加载滑动变量
+
+    variable_averages = tf.train.ExponentialMovingAverage(
+            mnist_train.MOVING_AVERAGE_DECAY
+        )
+        variabels_to_restore = variable_averages.variables_to_restore()
+        saver = tf.train.Saver(variabels_to_restore)
+    
+    saver.restore(sess,ckpt.model_checkpoint_path) 恢复四个变量
+    现在进行必要的accuracy计算，也就是run操作
+    run-->accuracy--> inference--> 就是将现有的四个值应用到现有的模型，
+    get_variable()方法可以获取已经存在的变量的值
+    
+验证流程也完成，一步异步都是很明确的，现在就是里面的一些小的计算过程需要详细一下。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
