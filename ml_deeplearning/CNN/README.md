@@ -145,3 +145,137 @@ http://www.image-net.org/challenges/LSVRC
 
     输入节点84个，输出节点10个，总共84*10+10=850个参数
     
+
+具体过程:
+
+	（1） 输入数据格式的转变
+	格式要求 4维，
+	reshape_xs=np.reshape(xs,(BATCH_SIZE,mnist_inference.IMAGE_SIZE,                                  mnist_inference.IMAGE_SIZE,
+	mnist_inference.NUM_CHANNELS))
+	Batch_size不用考虑是固定的，再就是行列，以及深度
+	
+	（2） 权重格式的改变
+	4维， 行，列，输入数据通道数目，深度
+	conv1_weights= tf.get_variable("weight",[CONV1_SIZE,CONV1_SIZE,NUM_CHANNELS,CONV1_DEEP],
+	initializer=tf.truncated_normal_initializer(stddev=0.1))
+
+	（3）计算公式的改变
+	前向计算:计算卷积
+	conv1= tf.nn.conv2(input_tensor,conv1_weights,strides=[1,1,1,1],padding="SAME")
+	计算softamx输出
+	relu1= tf.nn.relu(tf.nn.bias_add(conv1,conv1_biases))
+
+	（4） 池化层的计算
+	pool1= tf.nn.max_pool(relu1,ksize=[1,2,2,1],strides=[1,2,2,1],padding="SAME")
+
+	（5） 继续卷积层、池化层
+	（6） 全连接层
+	需要的数据是一行数据，不再是多维，
+	pool_shape = pool2.get_shape().as_list()
+	nodes= pool_shape[1]*pool_shape[2]*pool_shape[3]
+	reshaped=tf.reshape(pool2,[pool_shape[0],nodes])
+
+	全连接层weight
+	fc1_weighs = tf.get_variable("weight",[nodes,FC_SIZE],
+	initializer=tf.truncated_normal_initializer(stddev=0.1))
+	
+	只有全连接层的权重需要加入正则化
+	if regularizer != None:
+       tf.add_to_collection("losses",regularizer(fc1_weighs))
+	
+	比较有用的方法
+	if train: fc1= tf.nn.dropout(fc1,0.5)
+	
+	（7） 输出层
+	fc2_weighs =tf.get_variable("weight",[FC_SIZE,NUM_LABELS], initializer=
+        tf.truncated_normal_initializer(stddev=0.1))
+	
+	logit = tf.matmul(fc1,fc2_weighs)+fc2_biases
+	得到结果
+
+	（8） 训练过程详解
+	训练模式和前面是一样的，主要是在定义前向训练过程，
+	用python code模式，发现复杂的地方是在反向训练优化的过程中
+	用Tensorflow发现是在前向训练过程比较复杂，至于反向传播
+	（8.1） 定义滑动模型
+	variable_averages = tf.train.ExponentialMovingAverage(
+        MOVING_AVERAGE_DECAY, global_step
+    )
+    variables_averages_op = variable_averages.apply(tf.trainable_variables())
+	（8.2） 定义评判标准  交叉熵
+	cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, tf.argmax(y_, 1))
+    cross_entropy_mean = tf.reduce_mean(cross_entropy)
+	（8.3） 定义损失函数
+	loss = cross_entropy_mean + tf.add_n(tf.get_collection("losses"))
+	（8.4） 根据学习率优化损失函数即反向传播过程
+	learning_rate=tf.train.exponential_decay(LEARNING_RATE_BASE,                                               global_step,mnist.train.num_examples/BATCH_SIZE,
+     LEARNING_RATE_DECAY)
+    train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss,global_step=global_step)
+
+	（8.5） 定义反向运行Op
+	train_op = tf.group(variables_averages_op,train_step)
+	（8.6） 训练过程，feed_dict填充
+	xs,ys = mnist.train.next_batch(BATCH_SIZE)
+            reshape_xs=np.reshape(xs,(BATCH_SIZE,mnist_inference.IMAGE_SIZE,
+                                      mnist_inference.IMAGE_SIZE,mnist_inference.NUM_CHANNELS))
+            # print(np.shape(reshape_xs))
+            _,loss_value,step= sess.run([train_op,loss,global_step],feed_dict={x:reshape_xs,y_:ys})
+
+结论： 子MNIST测试数据上，上面给出的卷积神经网络可以达到99.4%的正确率。相比第5章中最高的98.4%的正确率，卷积神经网络可以巨幅提高神经网络在MNIST数据集上的正确率。
+
+LeNet-5模型就无法很好的处理类似ImageNet这样比较大的图像数据集。如何设计卷积神经网络的架构？
+
+	输入层-->(卷积层+-->池化层?)+-->全连阶层+
+
+在过滤器的深度上，大部分卷积神经网络都采用逐层递增的方式，每经过一次池化层后，卷积层过滤器的深度会乘以2，虽然不同的模型会使用不同的数字，但是逐层递增是比较普遍的模式。卷积层的步长一般为1，但是有的模型中也会使用2，或者3作为步长。池化层的配置相对简单，用的最多的就是最大池化层。池化层的过滤器变长一般为2或者3，步长也一般为2或者3.
+
+
+## Inception-v3 模型
+Inception是一种和LeNet-5完全不同的卷积神经网络结构。在Lenet-5模型中，不同卷积层通过串联的方式连接在一起，
+而Inception-v3模型中的Inception结构是将不同的卷积层通过并联的方式结合在一起，
+
+    Lenet-5中的卷积层用的边长 是1*1， 3*3, 5*5 的过滤器，Inception模块同时使用所有不同尺寸的
+    过滤器，然后再将得到的矩阵拼接起来。
+   
+    Inception模块会首先使用不同尺寸的过滤器输入矩阵。分别是1*1，3*3，5*5，不同的矩阵代表了Inception模块中的
+    一条计算路径。虽然过滤器的大小不同，但是如果所有过滤器都使用全0填充且步长为1，那么前向传播神经网络得到的
+    结果矩阵的长和宽多余输入矩阵一致。
+    
+        全0填充:  输入矩阵/步长 都一样的尺寸
+    深度为三个模块的和
+    
+    Inception-v3模型总共有46层，由11个Inception模块组成。总共有96个卷积层。
+    
+    # 直接使用Tf原始API实现卷积层
+
+    import tensorflow as tf
+    with tf.variable_scope(scope_name):
+    weights = tf.get_variable("weight",....)
+    biases = tf.get_variable('biases',...)
+    conv = tf.nn.conv2d()
+    relu = tf.nn.relu(tf.nn.bias_add(conv,biases))
+
+    # 使用TF-Slim实现卷积层，通过TF-Slim可以在一行中实现一个卷积层的前向传播算法
+    # slim.conv2d函数有3个参数是必填的，第一个参数为输入节点矩阵，第二个参数是当前卷积层过滤器的深度
+    # 第三个参数是过滤器的尺寸，可选的参数有过滤器步长，是否全0填充，激活函数的选择等等
+    net= tf.Slim.conv2d(input,32,[3,3])
+    
+
+## 卷积神经网络迁移学习
+迁移学习就是将上一个问题上训练好的模型通过简单的调整使其适用于一个新的问题。介绍如何利用ImageNet数据集上训练好的
+Inception-v3模型来解决一个新的图像分类问题，可以保留训练好的Inception-v3模型中所有卷积层的参数
+，只是替换最后一层全连接层。在最后一层全连接层之前的网络层称之为瓶颈层
+
+将新的图像通过训练好的卷积神经网络知道瓶颈层的过程可以看成是对图像进行特征提取的过程。。
+在训练好的inception-v3模型中，因为将瓶颈层的输出再通过一个单层的全连接层神经网络可以很好的区分1000种类别的图像，所以有理由
+认为瓶颈层的输出的节点向量被认为任何图像一个更加精简且表达能力更强的特征向量。于是，在新数据集上，可以直接利用这个训练好的神经网络对图像进行特征提取，然后再将提取的特征向量作为输出来训练一个单层的全连接神经网络处理新的分类问题。
+
+### TF实现迁移学习
+
+
+
+    
+    
+    
+            
+   
