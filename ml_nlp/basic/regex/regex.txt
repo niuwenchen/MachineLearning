@@ -1,0 +1,15 @@
+
+Match all of these…
+✔fu
+✔tofu
+✔snafu
+and none of these…
+✕futz
+✕fusillade
+✕functional
+✕discombobulated
+
+a(?!\d)   匹配后面不是数字的a  aa
+a(?=\d)   后面是数字的a       a1
+反向预测先行使用 ?! 指定，它匹配处于与正则表达式模式不匹配的字符串的起始点的搜索字符串。
+.*   匹配任意开头，包括空
