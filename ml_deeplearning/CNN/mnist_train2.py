@@ -54,7 +54,7 @@ def train(mnist):
             # print(np.shape(reshape_xs))
             _,loss_value,step= sess.run([train_op,loss,global_step],feed_dict={x:reshape_xs,y_:ys})
             # 需要保存的是loss，global_step
-            if i%1000 ==0:
+            if i%100 ==0:
                 print("After %d training step(s), lossing on trainng batch is %g" % (i, loss_value))
                 # 文件会在后面加上gloabl_step作为标记
                 saver.save(sess,os.path.join(MODEL_SAVE_PATH,MODEL_NAME),global_step=global_step)
