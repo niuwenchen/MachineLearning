@@ -20,14 +20,14 @@ def train(mnist):
     x = tf.placeholder(dtype=tf.float32, shape=[None, mnist_inference.INPUT_NODE], name="x-input")
     y_ = tf.placeholder(dtype=tf.float32, shape=[None, mnist_inference.OUTPUT_NODE], name='y-input')
     regularizer = tf.contrib.layers.l2_regularizer(REGULARIZATION_RATE)
-
-    # 前向传播过程
-    y=mnist_inference.inference(x,regularizer)
-    global_step= tf.Variable(0,trainable=False)
-
+    global_step = tf.Variable(0, trainable=False)
     variable_averages = tf.train.ExponentialMovingAverage(
         MOVING_AVERAGE_DECAY, global_step
     )
+
+    # 前向传播过程
+    y=mnist_inference.inference(x,variable_averages,regularizer)
+
     variables_averages_op = variable_averages.apply(tf.trainable_variables())
 
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, tf.argmax(y_, 1))

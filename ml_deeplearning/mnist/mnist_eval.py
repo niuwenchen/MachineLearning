@@ -48,7 +48,7 @@ def evaluate(mnist):
                 else:
                     print("No checkpoint file found")
                     return
-            time.sleep(EVAL_INTERVAL_SECS)
+            # time.sleep(EVAL_INTERVAL_SECS)
 
 def main(argv=None):
     mnist = input_data.read_data_sets("/MNIST_data/",one_hot=True)
